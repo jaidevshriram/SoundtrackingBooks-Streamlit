@@ -24,23 +24,24 @@ for i, row in df.iterrows():
 
     st_row = st.container()
 
-    cols = st_row.columns(3)
+    cols = st_row.columns(4)
 
-    cols[0].write(text)
+    cols[0].write(i)
+    cols[1].write(text)
 
     if "positive" in binary:
-        cols[1].success("Positive")
+        cols[2].success("Positive")
     elif "negative" in binary:
-        cols[1].error("Negative")
+        cols[2].error("Negative")
     else:
-        cols[1].info("Neutral")
+        cols[2].info("Neutral")
     # cols[2].write(ekman)
 
     if i in song_names:
-        print(i)
+        # print(i)
         audio_file = open(f"generated/{i}.wav", "rb")
         bytes = audio_file.read()
-        cols[2].audio(bytes, format='audio/wav')
+        cols[3].audio(bytes, format='audio/wav')
 
     st.markdown("<hr/>", unsafe_allow_html=True)
 
