@@ -26,7 +26,7 @@ for i, row in df.iterrows():
 
     cols = st_row.columns(4)
 
-    cols[0].write(i)
+    cols[0].write(str(i))
     cols[1].write(text)
 
     if "positive" in binary:
