@@ -17,7 +17,7 @@ print(chapterNames[:5])
 df = pd.read_csv(f"data/HP/sheets/{chapterNum+1:02}_emotion_ekman.csv")
 
 try:
-    song_names = list(map(lambda f: int(f.split('/')[-1].split('.')[0]), glob.glob(f"generated/{chapterNum}/*.wav")))
+    song_names = list(map(lambda f: int(f.split('/')[-1].split('.')[0]),  glob.glob(f"generated/{chapterNum}/*.mp3")))
 except:
     song_names = []
 
@@ -65,9 +65,9 @@ for i, row in df.iterrows():
 
     if i in song_names:
         print(i)
-        audio_file = open(f"generated/{chapterNum}/{i}.wav", "rb")
+        audio_file = open(f"generated/{chapterNum}/{i}.mp3", "rb")
         bytes = audio_file.read()
-        cols[num-1].audio(bytes, format='audio/wav')
+        cols[num-1].audio(bytes, format='audio/mp3')
 
     st.markdown("<hr/>", unsafe_allow_html=True)
 
