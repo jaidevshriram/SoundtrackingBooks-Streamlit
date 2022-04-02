@@ -6,70 +6,55 @@ import time
 import glob
 import pandas as pd
 
+version = st.sidebar.selectbox(
+    "Select version of soundtrack",
+    ["generated_chunked"]
+)
+
 chapterNum = st.sidebar.selectbox(
     "Select the Chapter",
     [i for i in range(len(os.listdir("data/HP/chapters")))]
 )
 
 chapterNames = sorted(os.listdir("data/HP/chapters/"), key=lambda x: int(x.split('-')[0].strip()))
-print(chapterNames[:5])
+# print(chapterNames[:5])
 
-df = pd.read_csv(f"data/HP/sheets/{chapterNum+1:02}_emotion_ekman.csv")
+with open(os.path.join("./data/HP/chunks/", f"{chapterNames[chapterNum].replace('txt', 'json')}")) as f:
+    chunked = json.load(f)
 
 try:
-    song_names = list(map(lambda f: int(f.split('/')[-1].split('.')[0]),  glob.glob(f"generated/{chapterNum}/*.mp3")))
+    song_names = list(map(lambda f: int(f.split('/')[-1].split('.')[0]),  glob.glob(f"{version}/{chapterNum}/*.mp3")))
 except:
     song_names = []
 
-print(song_names)
+st.title("Chapter " + str(chapterNum) + ": " + chapterNames[chapterNum].split('-')[1].replace('_', ' ').split('.')[0])
+st.subheader("Chunk / Paragraph / Audio")
 
-st.title("Chapter " + str(chapterNum + 1) + ": " + chapterNames[chapterNum].split('-')[1].replace('_', ' ').split('.')[0])
-st.subheader("Paragraph/Valence/Ekman/Audio")
+for i, chunk in enumerate(chunked['segmented']):
 
-print(df)
+    paras = chunk.splitlines()
 
-for i, row in df.iterrows():
+    for j, row in enumerate(paras):
 
-    if i == 0:
-        continue
+        row = row.strip()
 
-    try:
-        text = row['Paragraph Text']
-    except:
-        text = row['paragraph']
+        if len(row) == 0:
+            continue
 
-    num = 4
-    try:
-        # print(row['Binary Emotion Class/Score'])
-        binary = row['Binary Emotion Class/Score']
-        # ekman = row['Ekman Emotion Class']
-    except:
-        num = 3
+        st_row = st.container()
 
-    st_row = st.container()
+        cols = st_row.columns(4)
 
-    cols = st_row.columns(num)
+        cols[0].write(str(i))
+        cols[1].write(str(j//2))
+        cols[2].write(row)
 
-    cols[0].write(str(i))
-    cols[1].write(text)
+        if i in song_names and j == 0:
+            audio_file = open(f"{version}/{chapterNum}/{i}.mp3", "rb")
+            bytes = audio_file.read()
+            cols[3].audio(bytes, format='audio/mp3')
 
-    if num == 4:
+        st.markdown("<hr/>", unsafe_allow_html=True)
 
-        if "positive" in binary:
-            cols[2].success("Positive")
-        elif "negative" in binary:
-            cols[2].error("Negative")
-        else:
-            cols[2].info("Neutral")
-        # cols[2].write(ekman)
-
-    if i in song_names:
-        print(i)
-        audio_file = open(f"generated/{chapterNum}/{i}.mp3", "rb")
-        bytes = audio_file.read()
-        cols[num-1].audio(bytes, format='audio/mp3')
-
-    st.markdown("<hr/>", unsafe_allow_html=True)
-
-    # if i > 10:
-        # break
+        # if i > 10:
+            # break
