@@ -6,9 +6,11 @@ import time
 import glob
 import pandas as pd
 
+import streamlit.components.v1 as components
+
 version = st.sidebar.selectbox(
     "Select version of soundtrack",
-    ["generated_chunked"]
+    ["generated_chunked", "generated_chunked_low_arousal"]
 )
 
 chapterNum = st.sidebar.selectbox(
@@ -43,18 +45,27 @@ for i, chunk in enumerate(chunked['segmented']):
 
         st_row = st.container()
 
-        cols = st_row.columns(4)
+        cols = st_row.columns(2)
 
-        cols[0].write(str(i))
-        cols[1].write(str(j//2))
-        cols[2].write(row)
+        # cols[0].write(str(i))
+        # cols[1].write(str(j//2))
+        cols[0].write(row)
 
         if i in song_names and j == 0:
             audio_file = open(f"{version}/{chapterNum}/{i}.mp3", "rb")
             bytes = audio_file.read()
-            cols[3].audio(bytes, format='audio/mp3')
+            cols[1].audio(bytes, format='audio/mp3')
 
         st.markdown("<hr/>", unsafe_allow_html=True)
 
         # if i > 10:
             # break
+
+components.html(
+    """
+    <script>
+        window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: "smooth" });
+    </script>
+    """,
+    height=0,
+)
